@@ -2888,13 +2888,54 @@ from bs4.filter import SoupStrainer # noqa: E402
 
 class SoupReplacer(object):
 
-    def __init__(self, og_tag, alt_tag):
-        # original tag name we want to replace
-        self.og_tag = og_tag
-        # new tag name we want to use instead
-        self.alt_tag = alt_tag
+    def __init__(self, og_tag=None, alt_tag=None, name_xformer=None, attrs_xformer=None, xformer=None):
+        # Support both Milestone-2 API and Milestone-3 API
+        # Milestone-2: SoupReplacer(og_tag, alt_tag)
+        # Milestone-3: SoupReplacer(name_xformer=..., attrs_xformer=..., xformer=...)
+        if og_tag is not None and alt_tag is not None and name_xformer is None and attrs_xformer is None and xformer is None:
+            # Milestone-2 API: simple tag replacement
+            self.og_tag = og_tag
+            self.alt_tag = alt_tag
+            self.name_xformer = None
+            self.attrs_xformer = None
+            self.xformer = None
+        else:
+            # Milestone-3 API: transformer functions
+            self.og_tag = None
+            self.alt_tag = None
+            self.name_xformer = name_xformer
+            self.attrs_xformer = attrs_xformer
+            self.xformer = xformer
 
     def transform_name(self, name):
-        if name == self.og_tag:
-            return self.alt_tag
+        # Milestone-2 API: simple tag name replacement
+        if self.og_tag is not None and self.alt_tag is not None:
+            if name == self.og_tag:
+                return self.alt_tag
+            return name
+        
+        # Milestone-3 API: use name_xformer if provided
+        if self.name_xformer is not None:
+            # name_xformer receives a tag, but we only have the name here
+            # This will be called from handle_starttag where we have the tag object
+            return name
+        
         return name
+    
+    def transform_name_with_tag(self, tag):
+        # Milestone-3 API: transform tag name using name_xformer
+        if self.name_xformer is not None:
+            return self.name_xformer(tag)
+        return tag.name if hasattr(tag, 'name') else None
+    
+    def transform_attrs(self, tag):
+        # Milestone-3 API: transform attributes using attrs_xformer
+        if self.attrs_xformer is not None:
+            new_attrs = self.attrs_xformer(tag)
+            if new_attrs is not None:
+                tag.attrs = new_attrs
+    
+    def apply_xformer(self, tag):
+        # Milestone-3 API: apply general transformer with side effects
+        if self.xformer is not None:
+            self.xformer(tag)

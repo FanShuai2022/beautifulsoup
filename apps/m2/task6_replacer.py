@@ -1,9 +1,9 @@
-# Import SoupReplacer class and os module
+# Import SoupReplacer class and BeautifulSoup, os module
 import sys
 import os
 # Add beautifulsoup directory to path to import local bs4 package
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
-from bs4 import SoupReplacer
+from bs4 import BeautifulSoup, SoupReplacer
 
 def replace_b_tags_new_method(input_file, output_file):
     # Read HTML file content
@@ -13,19 +13,20 @@ def replace_b_tags_new_method(input_file, output_file):
     # Print file being processed
     print(f"\nProcessing: {input_file}")
     
-    # Create SoupReplacer object
-    # Replacement rule: replace b tags with blockquote tags
-    replacer = SoupReplacer(content, {'b': 'blockquote'})
-    # Perform parsing and replacement
-    replacer.parse_and_replace()
-    
     # Count the number of b tags in original file (for display)
-    # Note: This counts the original content, the count after replacement should be the same
     b_count = content.count('<b>')
     print(f"Found {b_count} <b> tags")
     
+    # Create SoupReplacer object
+    # Replacement rule: replace b tags with blockquote tags
+    replacer = SoupReplacer("b", "blockquote")
+    
+    # Parse HTML with replacer - tags will be replaced during parsing
+    soup = BeautifulSoup(content, "html.parser", replacer=replacer)
+    
     # Save replaced HTML to file
-    replacer.save_to_file(output_file)
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(str(soup))
     print(f"Saved to: {output_file}")
 
 if __name__ == "__main__":

@@ -717,9 +717,11 @@ class BeautifulSoup(Tag):
 
         """
         # If a SoupReplacer was provided, let it transform the tag name
-        if getattr(self, "replacer", None) is not None:
-            # simple Milestone-2 behavior: only rename tags
-            name = self.replacer.transform_name(name)
+        replacer = getattr(self, "replacer", None)
+        if replacer is not None:
+            # Milestone-2 API: simple tag name replacement
+            if replacer.og_tag is not None and replacer.alt_tag is not None:
+                name = replacer.transform_name(name)
 
         attr_container = self.builder.attribute_dict_class(**kwattrs)
         if attrs is not None:
@@ -739,6 +741,22 @@ class BeautifulSoup(Tag):
             sourceline=sourceline,
             sourcepos=sourcepos,
         )
+
+        # Apply Milestone-3 API transformers if provided
+        if replacer is not None:
+            # Apply name_xformer if provided (transforms tag name)
+            if replacer.name_xformer is not None:
+                new_name = replacer.transform_name_with_tag(tag)
+                if new_name is not None and new_name != tag.name:
+                    tag.name = new_name
+            
+            # Apply attrs_xformer if provided (transforms attributes)
+            if replacer.attrs_xformer is not None:
+                replacer.transform_attrs(tag)
+            
+            # Apply xformer if provided (general transformer with side effects)
+            if replacer.xformer is not None:
+                replacer.apply_xformer(tag)
 
         if string is not None:
             tag.string = string
@@ -1034,9 +1052,11 @@ class BeautifulSoup(Tag):
         self.endData()
 
         # If a SoupReplacer was provided, let it transform the tag name
-        if getattr(self, "replacer", None) is not None:
-            # simple Milestone-2 behavior: only rename tags
-            name = self.replacer.transform_name(name)
+        replacer = getattr(self, "replacer", None)
+        if replacer is not None:
+            # Milestone-2 API: simple tag name replacement
+            if replacer.og_tag is not None and replacer.alt_tag is not None:
+                name = replacer.transform_name(name)
 
         if (
             self.parse_only
@@ -1064,6 +1084,23 @@ class BeautifulSoup(Tag):
         )
         if tag is None:
             return tag
+        
+        # Apply Milestone-3 API transformers if provided
+        if replacer is not None:
+            # Apply name_xformer if provided (transforms tag name)
+            if replacer.name_xformer is not None:
+                new_name = replacer.transform_name_with_tag(tag)
+                if new_name is not None and new_name != tag.name:
+                    tag.name = new_name
+            
+            # Apply attrs_xformer if provided (transforms attributes)
+            if replacer.attrs_xformer is not None:
+                replacer.transform_attrs(tag)
+            
+            # Apply xformer if provided (general transformer with side effects)
+            if replacer.xformer is not None:
+                replacer.apply_xformer(tag)
+        
         if self._most_recent_element is not None:
             self._most_recent_element.next_element = tag
         self._most_recent_element = tag
