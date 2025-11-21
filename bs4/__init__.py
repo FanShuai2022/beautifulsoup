@@ -1127,6 +1127,38 @@ class BeautifulSoup(Tag):
         """
         self.current_data.append(data)
 
+    def __iter__(self) -> Iterator[PageElement]:
+        """Iterate over all elements in the document tree using depth-first traversal.
+        
+        This implements the iterator protocol for BeautifulSoup objects.
+        The iteration is lazy - elements are yielded one at a time as the
+        tree is traversed, not pre-collected into a list.
+        
+        :yield: PageElement objects (Tags and NavigableStrings) in document order.
+        """
+        # Start from the first element in the document tree
+        # If there are no contents, yield nothing
+        if not self.contents:
+            return
+        
+        # Use next_element to traverse the tree in depth-first order
+        # This matches the order used by .descendants
+        current = self.contents[0]
+        
+        # Find the last descendant to know when to stop
+        last_descendant = self._last_descendant(accept_self=True)
+        if last_descendant is None:
+            return
+        
+        # Stop at the element after the last descendant
+        stop_node = last_descendant.next_element
+        
+        # Traverse using next_element chain
+        while current is not None and current is not stop_node:
+            next_node = current.next_element
+            yield current
+            current = next_node
+
     def decode(
         self,
         indent_level: Optional[int] = None,
