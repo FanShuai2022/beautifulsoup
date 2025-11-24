@@ -1,0 +1,21 @@
+<xml version="1.0" encoding="UTF-8">
+    <bookstore>
+        <book id="book1" category="Programming">
+            <title lang="en">Python Programming</title>
+            <author>Zhang San</author>
+            <year>2023</year>
+            <price>89.00</price>
+        </book>
+        <book id="book2" category="Database">
+            <title lang="en">MySQL: From Beginner to Expert</title>
+            <author>Li Si</author>
+            <year>2022</year>
+            <price>79.00</price>
+        </book>
+        <book id="book3" category="Frontend">
+            <title lang="en">Web Development</title>
+            <author>Wang Wu</author>
+            <year>2024</year>
+            <price>99.00</price>
+        </book>
+    </bookstore>

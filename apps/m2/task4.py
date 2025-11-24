@@ -36,8 +36,8 @@ def print_tags_with_id_optimized(file_path):
 if __name__ == "__main__":
     # Define list of test files
     test_files = [
-        'test_files/file3_ids.html',
-        'test_files/file10_mixed.html'
+        '../test_files/file3_ids.html',
+        '../test_files/file10_mixed.html'
     ]
     
     # Iterate through and process each test file

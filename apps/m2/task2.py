@@ -31,9 +31,9 @@ def print_all_links_optimized(file_path):
 
 if __name__ == "__main__":
     # Define list of test files
-    test_files = [
-        'test_files/file2_links.html',
-        'test_files/file4_nested.html'
+    test_files = [                    #string[] testFiles =new string[]
+        '../test_files/file2_links.html',
+        '../test_files/file4_nested.html'
     ]
     
     # Iterate through and process each test file
